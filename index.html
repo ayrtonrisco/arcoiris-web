@@ -1,0 +1,573 @@
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
+  <style>
+    .none {
+      display: none;
+    }
+
+    .mapa {
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <fieldset>
+      <legend>Configure su busqueda</legend>
+      <div class="form-group ">
+        <label for="selectRuta">Seleccione una ruta</label>
+        <select id="selectRuta" class="selectpicker">
+          <option value="ruta_00">Ruta E: Milagro -> Florencia</option>
+          <option value="ruta_01">Ruta E: Florencia -> Milagro</option>
+          <option value="ruta_02">Ruta Z: Milagro -> Fcia. Mora</option>
+          <option value="ruta_03">Ruta Z: Fcia. Mora -> Milagro</option>
+        </select>
+      </div>
+      <div class="form-group ">
+        <label for="selectCarro">Selecciona un carro</label>
+        <select id="selectCarro" class="selectpicker" data-live-search="true">
+          <!-- <option value="8170877847">Gerson</option> -->
+          <!-- <option value="t4b167">Test</option>-->
+        </select>
+      </div>
+      <div class="form-group ">
+        <div class="">Selecciona un rango de fecha</div>
+        <div class="row">
+          <div class="col-md-6 ">
+            <span>Fecha Inicio</span>
+            <input type="text" class="text-right date" id="fechaInicio" />
+          </div>
+          <div class="col-md-6 ">
+            <span>Hora inicio</span>
+            <input id="tpInicio">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 ">
+            <span>Fecha Fin</span>
+            <input type="text" class="text-right date " id="fechaFin" />
+          </div>
+          <div class="col-md-6 ">
+            <span>Hora fin</span>
+            <input id="tpFin">
+          </div>
+        </div>
+    </fieldset>
+    </div>
+    <div class="row">
+      <div class="col-xs-3 col-md-3 col-md-offset-2 col-xs-offset-2">
+        <button id="mostrar" type="button" class="btn btn-primary">Cargar</button>
+      </div>
+      <div class="col-xs-3 col-md-3">
+        <button id="mostrarMapa" type="button" class="btn btn-info none">Mostrar Mapa</button>
+      </div>
+      <div class="col-xs-3 col-md-3 ">
+        <button id="mostrarDetalle" type="button" class="btn btn-primary">Cargar en Detalle</button>
+      </div>
+    </div>
+    <!-- <button id="btnCargar">Prueba</button>-->
+    <div class="clearfix visible-xs-block"></div>
+    <div class="row">
+      <div class="col-xs-5 col-xs-offset-2 col-md-4 col-md-offset-4">
+        <h2>Total:</h2>
+        <h1 id="totalAPagar"></h1>
+      </div>
+      <div class="row">
+        <div id="tablaTiempos" class=" col-xs-10 col-md-10 col-md-offset-1 col-xs-offset-1">
+        </div>
+      </div>
+      <div id="divDetalle" class="row none">
+        <div class="col-md-12">
+          <table id="tbItems" class="display table table-striped table-bordered dataTable no-footer table-hover " width="100%">
+            <colgroup>
+              <col style="width: 10%" />
+              <col style="width: 10%" />
+              <col style="width: 10%" />
+              <col style="width: 30%" />
+              <col style="width: 20%" />
+              <col style="width: 20%" />
+              <col/>
+            </colgroup>
+            <thead class="thead-inverse">
+              <tr>
+                <th>Orden</th>
+                <th>Id</th>
+                <th>Identificador carro</th>
+                <th>Direccion</th>
+                <th>Hora</th>
+                <th>Diferencia</th>
+                <th class="claseOculta">contable</th>
+              </tr>
+            </thead>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      <div class="row">
+        <div id="divMapa" class="col-xs-10 col-md-10 col-md-offset-1 col-xs-offset-1 mapa none"></div>
+      </div>
+    </div>
+  </div>
+</body>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.16/datatables.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvNusKJ4p6x-Ww9Qq2tsapFl1xJsI707Q">
+</script>
+
+<script>
+  var API_KEY = "AIzaSyDvNusKJ4p6x-Ww9Qq2tsapFl1xJsI707Q";
+  var def_COORD_1 = "-8.1294";
+  var def_COORD_1 = "-79.0332";
+  var horaInicio, horaFin, minutosInicio, minutosFin, tabla, listaResultados, listaPuntosRespuesta;
+  var listaItems = new Array();
+  var map;
+  /*
+  Milagro-Florencia
+  Pablo Casal 26 minutos
+  Upao 44 minutos
+  28 Julio 51 minutos
+  Vallejo 57 minutos
+  26Marzo 73 minutos
+  Paradero 79 minutos
+  */
+  /*Los minutos son todos con respecto a la hora seleccionada a la web*/
+  //-8.100245, -79.044094
+  var puntoOtanor = [-8.0354002,-79.0610122,9,"Otanor",1,true];
+  var puntoSoldador = [-8.0976531,-79.0431916, 25, "Pablo Casal", 2, true];
+  //-8.126579, -79.033348
+  var puntoUpao = [-8.125565, -79.036303, 44, "Upao", 3, true];
+  //-8.119665, -79.026370
+  var puntoCostaRica = [-8.119665, -79.026370, 56, "28 Julio", 4, true];
+  var puntoVallejo = [-8.105930, -79.013891, 65, "Vallejo", 5, true];
+  var puntoMarzo = [-8.0860259, -79.0180154, 81, "26 de Marzo", 6, true];
+  var puntoFlorencia = [-8.0800171, -79.0242461, 87, "Hospital de Florencia", 7, false];
+  var LISTA_COORDENADAS_IDA_MILAGRO = [puntoOtanor,puntoSoldador, puntoUpao, puntoCostaRica, puntoVallejo, puntoMarzo, puntoFlorencia];
+
+  var puntoMarzoVuelta = [-8.0860259, -79.0180154, 5, "26 de Marzo", 1, true];
+  var puntoVallejo = [-8.105930, -79.013891, 20, "Vallejo", 2, true];
+  var puntoEspania = [-8.1162545, -79.0263591, 32, "España - Panama", 3, false];
+  var puntoEsperanza = [-8.0824758, -79.0446034, 52, "Esperanza", 4, true];
+  var puntoMilagro = [-8.015158, -79.067489, 68, "Milagro", 5, false];
+  var LISTA_COORDENADAS_VUELTA_MILAGRO = [puntoMarzoVuelta, puntoVallejo, puntoEspania, puntoEsperanza, puntoMilagro];
+
+  var puntoOtanorZ = [-8.0354002,-79.0610122,9,"Otanor",1,true];
+  //var puntoZVillareal = [-8.0955695, -79.0126711, 43, "Villareal", 2, true];
+  var puntoZVillareal = [-8.0994551, -79.0140564, 44, "Av.Peru/Av.America", 2, true];
+  var puntoZFlorenciaIda = [-8.0800171, -79.0242461, 58, "Hospital de Florencia", 3, false];
+  var LISTA_COORDENADAS_Z_MIL_FLOR = [puntoOtanorZ,puntoZVillareal, puntoZFlorenciaIda];
+
+  var puntoZSantaVuelta = [-8.0877092, -79.0117712, 10, "Santa", 1, false];
+  var puntoZVillarealVuelta = [-8.0955695, -79.0126711, 14, "Villareal", 2, true];
+  var puntoZJoseGabriel = [-8.0824758, -79.0446034, 37, "Esperanza 2° Paradero", 3, true];
+  var puntoZMilagro = [-8.015158, -79.067489, 52, "Milagro", 4, false];
+  var LISTA_COORDENADAS_Z_FLOR_MIL = [puntoZSantaVuelta, puntoZVillarealVuelta, puntoZJoseGabriel, puntoZMilagro];
+
+  var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+  var optionsTabla = { hour: '2-digit', minute: '2-digit' };
+  var infowindow = null;
+  class Registro {
+    constructor(orden, id, identif, direccion, hora, diferencia, contable) {
+      this.orden = orden;
+      this.id = id;
+      this.identif = identif;
+      this.direccion = direccion;
+      this.hora = hora;
+      this.diferencia = diferencia;
+      this.contable = contable;
+    }
+  }
+  function obtenerListaCoordenadas() {
+    var nombreRuta = $("#selectRuta").val();
+    var respuesta;
+    if (nombreRuta == 'ruta_00') {
+      respuesta = LISTA_COORDENADAS_IDA_MILAGRO;
+    } else if (nombreRuta == 'ruta_01') {
+      respuesta = LISTA_COORDENADAS_VUELTA_MILAGRO;
+    } else if (nombreRuta == 'ruta_02') {
+      respuesta = LISTA_COORDENADAS_Z_MIL_FLOR;
+    } else {
+      respuesta = LISTA_COORDENADAS_Z_FLOR_MIL;
+    }
+    return respuesta;
+  }
+  function obtenerDireccion(coord1, coord2) {
+    var respuesta = "NO";
+    $.ajax({
+      url: "https://maps.googleapis.com/maps/api/geocode/json?address=" + coord1 + "," + coord2 + "&key=" + API_KEY,
+      method: "GET",
+      cache: false,
+      async: false,
+      success: function (data) {
+        respuesta = data.results[0].formatted_address;
+      }
+    });
+    return respuesta;
+  }
+
+  function obtenerCoordenadasCoincidencias(listaTotas, listaCoordenadas) {
+    var coincidencias = new Array();
+    /*
+    Iteramos la lista de coordenadas. Vamos a obtener la coordenada que mas cercana a cada punto
+    Luego instanciaremos cada objeto registro
+    */
+    for (var j = 0; j < listaCoordenadas.length; j++) {
+      var difTemporal = 10.00;
+      var objTemporal;
+      var latitudPunto = Math.abs(listaCoordenadas[j][0]);
+      var longitudPunto = Math.abs(listaCoordenadas[j][1]);
+      for (var i = 0; i < listaTotas.length; i++) {
+        if (j == 1) {
+          console.log(difLat + " == " + difLon);
+        }
+        var difLat = Math.abs(latitudPunto - Math.abs(parseFloat(listaTotas[i].GPSPoint_lat)));
+        var difLon = Math.abs(longitudPunto - Math.abs(parseFloat(listaTotas[i].GPSPoint_lon)));
+        var difTotal = difLat + difLon;
+        if (difTotal < difTemporal) {
+          difTemporal = difTotal;
+          objTemporal = listaTotas[i];
+        }
+      }
+      coincidencias.push([objTemporal, listaCoordenadas[j][2], listaCoordenadas[j][3], listaCoordenadas[j][4], listaCoordenadas[j][5]]);
+    }
+    return coincidencias;
+  }
+  function generarTablaMinutos() {
+    $("#tablaTiempos").html(" ");
+    var listaPuntos = obtenerListaCoordenadas();
+    var cadenaTabla = "";
+    cadenaTabla += "<table id='tablaHoras' class='table'>";
+    cadenaTabla += "<tr><th> </th>";
+    for (var i = 0; i < listaPuntos.length; i++) {
+      var claseCuenta = "";
+      if (!listaPuntos[i][5]) {
+        claseCuenta = "bg-danger";
+      }
+      cadenaTabla += "<th class='" + claseCuenta + "' >" + listaPuntos[i][3] + "</th>";
+    }
+    cadenaTabla += "</tr><tr><td>Deberia marcar</td>";
+    for (var i = 0; i < listaPuntos.length; i++) {
+      var numSegundos = parseInt(listaPuntos[i][2]) * 60 * 1000;
+      var dateParts = $("#fechaInicio").val().split("/");
+      var fechaInicio = new Date(dateParts[1] + "/" + dateParts[0] + "/" + dateParts[2] + " " + horaInicio + ":" + minutosInicio);
+      var milSecs = fechaInicio.getTime() + (numSegundos);
+      var horaTabla = new Date(milSecs);
+      var localeSpecificTime = horaTabla.toLocaleTimeString();
+      var cadenaHora = horaTabla.toLocaleDateString([], optionsTabla);
+      var claseCuenta = "";
+      if (!listaPuntos[i][5]) {
+        claseCuenta = "bg-danger";
+      }
+      //cadenaTabla += "<td>"+localeSpecificTime.replace(/:\d+ /, ' ')+"</td>";
+      cadenaTabla += "<td class='" + claseCuenta + "'>" + cadenaHora.substring(cadenaHora.length - 5, cadenaHora.length); +"</td>";
+    }
+    cadenaTabla += "</tr></table>";
+    $("#tablaTiempos").html(cadenaTabla);
+  }
+
+function cargarListaVehiculos(){
+
+  $.ajax({
+        url: "http://142.93.185.141:8080/webservice/gps.json?a=monitoreo&u=e.arcoiris&p=mel@min@2020&g=e.arcoiris&l=1",
+        method: "GET",
+        cache: false,
+        async: false,
+        crossDomain: true,
+        dataType: 'JSON',
+        success: function (data) {
+          console.log(data);
+          data.DeviceList.forEach(function(element) {
+            $("#selectCarro").append("<option value="+element.Device+">"+element.Device_desc+"</option>");
+          });
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert("Hubo un error al cargar la lista de vehiculos");
+        }
+      });
+}
+  $(function () {
+    cargarListaVehiculos();
+
+    $("#fechaInicio").datepicker({
+      dateFormat: 'dd/mm/yy',
+      maxDate: '0',
+      defaultDate: 0,
+      firstDay: 1,
+      dayNames: ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"],
+      dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+      monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+        "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+      autoclose: true,
+      todayHighlight: true
+    });
+    $("#fechaFin").datepicker({
+      dateFormat: 'dd/mm/yy',
+      maxDate: new Date(),
+      defaultDate: 0,
+      firstDay: 1,
+      dayNames: ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"],
+      dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+      monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+        "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+      autoclose: true,
+      todayHighlight: true
+    });
+    $('#tpInicio').timepicker({
+      timeFormat: 'HH:mm',
+      dynamic: true,
+      dropdown: false,
+      scrollbar: true,
+      change: function (time) {
+        horaInicio = time.getHours();
+        minutosInicio = time.getMinutes();
+        generarTablaMinutos();
+      }
+    });
+    $('#tpFin').timepicker({
+      timeFormat: 'HH:mm',
+
+      dynamic: true,
+      dropdown: false,
+      defaultTime: new Date(),
+      scrollbar: true,
+      change: function (time) {
+        horaFin = time.getHours();
+        minutosFin = time.getMinutes()
+      }
+    });
+    tabla = $("#tbItems").DataTable({
+      paging: false,
+      searching: false,
+      bInfo: false,
+      responsive: true,
+      data: listaItems,
+      columns: [
+        { data: "orden" },
+        { data: "id" },
+        { data: "identif" },
+        { data: "direccion" },
+        { data: "hora" },
+        { data: "diferencia" },
+        { data: "contable", "visible": false }
+      ],
+      language: {
+        "emptyTable": "No hay datos en la tabla"
+      },
+      createdRow: function (row, data, index) {
+        if (data[6]) {
+          $('td', row).eq(6).addClass('highlight');
+          cosole.log("Si");
+        }
+      }
+    });
+    $("#mostrar").click(function () {
+      tabla.clear().draw();
+      $("#mostrarMapa").removeClass("none");
+      listaItems = new Array();
+      var identificador = $("#selectCarro").val();
+      var dateParts = $("#fechaInicio").val().split("/");
+      var fechaInicio = new Date(dateParts[1] + "/" + dateParts[0] + "/" + dateParts[2] + " " + horaInicio + ":" + minutosInicio).getTime() / 1000;
+      dateParts = $("#fechaFin").val().split("/");
+      var fechaFin = new Date(dateParts[1] + "/" + dateParts[0] + "/" + dateParts[2] + " " + horaFin + ":" + minutosFin).getTime() / 1000;
+      var url = "http://142.93.185.141:8080/webservice/gps.json?a=monitoreo&u=e.arcoiris&p=123arcoiris&d=" + identificador + "&rf=" + fechaInicio + "&rt=" + fechaFin;
+      console.log(url);
+      $.ajax({
+        //url: "http://www.sinotracking.com/app/AppJson.asp?Cmd=Proc_GetTrack&Data=N\'"+identificador+"\'%2CN\'"+fechaInicio+"\'%2CN\'"+fechaFin+"\'%2CN\'1000\'&Field=",
+        url: "http://142.93.185.141:8080/webservice/gps.json?a=monitoreo&u=e.arcoiris&p=123arcoiris&d=" + identificador + "&rf=" + fechaInicio + "&rt=" + fechaFin + "&l=250",
+        method: "GET",
+        cache: false,
+        async: false,
+        crossDomain: true,
+        dataType: 'JSON',
+        success: function (data) {
+          var diferenciaPagar = 0;
+          //var json = $.parseJSON(data);
+          console.log("Cantidad de registros:" + data.DeviceList[0].EventData.length);
+          var nombreVarLista = $("#selectRuta").val();
+          var listaCoordenadas = obtenerListaCoordenadas();
+          //console.log(data.DeviceList[0].EventData);
+          var resultados = obtenerCoordenadasCoincidencias(data.DeviceList[0].EventData, listaCoordenadas);
+          listaPuntosRespuesta = data.DeviceList[0].EventData;
+          listaResultados = resultados;
+          var filaTr = "<tr><td>Hora marcada</td>";
+          console.log(resultados);
+          var valido = true;
+          for (var i = 0; i < resultados.length; i++) {
+            if (resultados[i][0] == undefined || resultados[i][0] == null) {
+              valido = false;
+            }
+          }
+
+          if (!valido) {
+            alert("No hay registros para ese vehiculo/fecha en todos los puntos");
+          } else {
+
+            for (var i = 0; i < resultados.length; i++) {
+              //var direccion = obtenerDireccion(resultados[i][0][4],resultados[i][0][3]);
+              var fechaRegistro = new Date(parseInt(resultados[i][0].Timestamp) * 1000);
+              var diferenciaStamp = fechaRegistro.getTime() - fechaInicio * 1000;
+              var diferenciaMinutos = parseInt(diferenciaStamp / 60000);
+              var difMins = diferenciaMinutos - resultados[i][1];
+              if (difMins > 0 && resultados[i][4]) {
+                diferenciaPagar += difMins;
+              }
+
+              var cadenaHora = fechaRegistro.toLocaleDateString([], optionsTabla);
+              //cadenaTabla += "<td>"+localeSpecificTime.replace(/:\d+ /, ' ')+"</td>";
+              var claseCuenta = "";
+              if (!resultados[i][4]) {
+                claseCuenta = "bg-danger";
+              }
+              filaTr += "<td class='" + claseCuenta + "'>" + cadenaHora.substring(cadenaHora.length - 5, cadenaHora.length) + " <b>(" + difMins + ")</b></td>";
+              //var nuevoItem = new Registro(resultados[i][3],resultados[i][2],resultados[i][0][1],direccion,fechaRegistro.toLocaleDateString('es-PE', options),difMins,resultados[i][4]);
+              //listaItems.push(nuevoItem);
+              //tabla.row.add(nuevoItem).draw(false);
+            }
+          }
+          filaTr += "</tr>";
+          $("#tablaHoras tbody").append(filaTr);
+          $("#totalAPagar").html(diferenciaPagar);
+        }
+      });
+
+    });
+
+    $("#mostrarDetalle").click(function () {
+      $("#divDetalle").removeClass("none");
+      var identificador = $("#selectCarro").val();
+      var dateParts = $("#fechaInicio").val().split("/");
+      var fechaInicio = new Date(dateParts[1] + "/" + dateParts[0] + "/" + dateParts[2] + " " + horaInicio + ":" + minutosInicio).getTime() / 1000;
+      dateParts = $("#fechaFin").val().split("/");
+      var fechaFin = new Date(dateParts[1] + "/" + dateParts[0] + "/" + dateParts[2] + " " + horaFin + ":" + minutosFin).getTime() / 1000;
+      if (listaResultados.length > 0) {
+        var diferenciaPagar = 0;
+
+        var nombreVarLista = $("#selectRuta").val();
+        var listaCoordenadas = obtenerListaCoordenadas();
+        for (var i = 0; i < listaResultados.length; i++) {
+          var direccion = obtenerDireccion(listaResultados[i][0][4], listaResultados[i][0][3]);
+          var fechaRegistro = new Date(parseInt(listaResultados[i][0][2]) * 1000);
+          console.log("fehaRegisstro" + fechaRegistro.getTime() + "  -" + fechaInicio);
+          var diferenciaStamp = fechaRegistro.getTime() - fechaInicio * 1000;
+          var diferenciaMinutos = parseInt(diferenciaStamp / 60000);
+          var difMins = diferenciaMinutos - listaResultados[i][1];
+          console.log("diferenciaMinutos: " + diferenciaMinutos + " - listaResultados[i][1]" + listaResultados[i][1]);
+          if (difMins > 0 && listaResultados[i][4]) {
+            diferenciaPagar += difMins;
+          }
+
+
+
+          var cadenaHora = fechaRegistro.toLocaleDateString([], optionsTabla);
+          //cadenaTabla += "<td>"+localeSpecificTime.replace(/:\d+ /, ' ')+"</td>";
+          var nuevoItem = new Registro(listaResultados[i][3], listaResultados[i][2], listaResultados[i][0][1], direccion, fechaRegistro.toLocaleDateString('es-PE', options), difMins, listaResultados[i][4]);
+          listaItems.push(nuevoItem);
+          tabla.row.add(nuevoItem).draw(false);
+        }
+      }
+    });
+
+    $("#selectRuta").change(function () {
+      generarTablaMinutos();
+    });
+    $("#mostrarMapa").click(function () {
+      $("#divMapa").removeClass("none");
+      map = new google.maps.Map(document.getElementById('divMapa'), {
+        zoom: 13,
+        center: new google.maps.LatLng(-8.111944, -79.028889),
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      });
+
+      var markerIcon = {
+        url: 'pin.png',
+        scaledSize: new google.maps.Size(80, 80),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(32,65),
+        labelOrigin:  new google.maps.Point(40,33),
+      };
+
+      var puntosParaElMapa = new Array();
+      for (var i = 0; i < listaPuntosRespuesta.length; i++) {
+        var coord = { lat: listaPuntosRespuesta[i].GPSPoint_lat, lng: listaPuntosRespuesta[i].GPSPoint_lon };
+        puntosParaElMapa.push(coord);
+        var markerLabel = listaPuntosRespuesta[i].Timestamp_time;
+        //var imgMark = 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2238%22%20height%3D%2238%22%20viewBox%3D%220%200%2038%2038%22%3E%3Cpath%20fill%3D%22%23808080%22%20stroke%3D%22%23ccc%22%20stroke-width%3D%22.5%22%20d%3D%22M34.305%2016.234c0%208.83-15.148%2019.158-15.148%2019.158S3.507%2025.065%203.507%2016.1c0-8.505%206.894-14.304%2015.4-14.304%208.504%200%2015.398%205.933%2015.398%2014.438z%22%2F%3E%3Ctext%20transform%3D%22translate%2819%2018.5%29%22%20fill%3D%22%23fff%22%20style%3D%22font-family%3A%20Arial%2C%20sans-serif%3Bfont-weight%3Abold%3Btext-align%3Acenter%3B%22%20font-size%3D%2212%22%20text-anchor%3D%22middle%22%3E' + listaPuntosRespuesta[i].Timestamp_time + '%3C%2Ftext%3E%3C%2Fsvg%3E';
+        /*
+        var marker = new google.maps.Marker({
+          position: coord,
+          map: map,
+          title: markerLabel,
+          icon: markerIcon,
+          label: {
+            text: markerLabel,
+            color: "#eb3a44",
+            fontSize: "16px",
+            fontWeight: "bold"
+          }
+        });
+        */
+      }
+      var flightPath = new google.maps.Polyline({
+        path: puntosParaElMapa,
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+      });
+      flightPath.setMap(map);
+
+      console.log("Aqui va");
+      console.log(listaResultados);
+      
+      for(var i = 0; i < listaResultados.length ; i++){
+        infowindow = new google.maps.InfoWindow();
+        var contenido = '<div id="content"><h2>'+listaResultados[i][2]+' - '+listaResultados[i][0].Timestamp_time+'</h2></div>';
+        /*
+        var infowindow = new google.maps.InfoWindow({
+          content: contenido
+        });
+        */
+        var marker = new google.maps.Marker({
+          position: { lat: listaResultados[i][0].GPSPoint_lat, lng: listaResultados[i][0].GPSPoint_lon },
+          map: map,
+          title: listaResultados[i][2],
+          html: contenido
+        });
+        google.maps.event.addListener(marker, "click", function () {
+			infowindow.setContent(this.html);
+			infowindow.open(map, this);
+		});
+
+
+
+        console.log(listaResultados[i][2]);
+
+      }
+
+    });
+
+
+    //No funciona el defaultDate al instanciar el DatePicker
+    $("#fechaInicio").datepicker('setDate', new Date());
+    $("#fechaFin").datepicker('setDate', new Date());
+    $('#tpInicio').timepicker('setTime', new Date());
+    $('#tpFin').timepicker('setTime', new Date());
+
+  });
+</script>
+
+</html>
