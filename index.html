@@ -148,14 +148,14 @@
   /*Los minutos son todos con respecto a la hora seleccionada a la web*/
   //-8.100245, -79.044094
   var puntoOtanor = [-8.0354002,-79.0610122,7,"Otanor",1,true];
-  var puntoSoldador = [-8.0976531,-79.0431916, 25, "Pablo Casal", 2, true];
+  var puntoSoldador = [-8.0976531,-79.0431916, 23, "Pablo Casal", 2, true];
   //-8.126579, -79.033348
-  var puntoUpao = [-8.125565, -79.036303, 44, "Upao", 3, true];
+  var puntoUpao = [-8.125565, -79.036303, 42, "Upao", 3, true];
   //-8.119665, -79.026370
-  var puntoCostaRica = [-8.119665, -79.026370, 56, "28 Julio", 4, true];
-  var puntoVallejo = [-8.105930, -79.013891, 65, "Vallejo", 5, true];
-  var puntoMarzo = [-8.0860259, -79.0180154, 81, "26 de Marzo", 6, true];
-  var puntoFlorencia = [-8.0800171, -79.0242461, 87, "Hospital de Florencia", 7, false];
+  var puntoCostaRica = [-8.119665, -79.026370, 54, "28 Julio", 4, true];
+  var puntoVallejo = [-8.105930, -79.013891, 63, "Vallejo", 5, true];
+  var puntoMarzo = [-8.0860259, -79.0180154, 79, "26 de Marzo", 6, true];
+  var puntoFlorencia = [-8.0800171, -79.0242461, 85, "Hospital de Florencia", 7, false];
   var LISTA_COORDENADAS_IDA_MILAGRO = [puntoOtanor,puntoSoldador, puntoUpao, puntoCostaRica, puntoVallejo, puntoMarzo, puntoFlorencia];
 
   var puntoMarzoVuelta = [-8.0860259, -79.0180154, 5, "26 de Marzo", 1, true];
@@ -167,14 +167,14 @@
 
   var puntoOtanorZ = [-8.0354002,-79.0610122,7,"Otanor",1,true];
   //var puntoZVillareal = [-8.0955695, -79.0126711, 43, "Villareal", 2, true];
-  var puntoZVillareal = [-8.0994551, -79.0140564, 44, "Av.Peru/Av.America", 2, true];
-  var puntoZFlorenciaIda = [-8.0800171, -79.0242461, 58, "Hospital de Florencia", 3, false];
+  var puntoZVillareal = [-8.0994551, -79.0140564, 42, "Av.Peru/Av.America", 2, true];
+  var puntoZFlorenciaIda = [-8.0800171, -79.0242461, 56, "Hospital de Florencia", 3, false];
   var LISTA_COORDENADAS_Z_MIL_FLOR = [puntoOtanorZ,puntoZVillareal, puntoZFlorenciaIda];
 
   var puntoZSantaVuelta = [-8.0877092, -79.0117712, 8, "Santa", 1, false];
-  var puntoZVillarealVuelta = [-8.0955695, -79.0126711, 14, "Villareal", 2, true];
-  var puntoZJoseGabriel = [-8.0824758, -79.0446034, 37, "Esperanza 2° Paradero", 3, true];
-  var puntoZMilagro = [-8.015158, -79.067489, 52, "Milagro", 4, false];
+  var puntoZVillarealVuelta = [-8.0955695, -79.0126711, 12, "Villareal", 2, true];
+  var puntoZJoseGabriel = [-8.0824758, -79.0446034, 35, "Esperanza 2° Paradero", 3, true];
+  var puntoZMilagro = [-8.015158, -79.067489, 50, "Milagro", 4, false];
   var LISTA_COORDENADAS_Z_FLOR_MIL = [puntoZSantaVuelta, puntoZVillarealVuelta, puntoZJoseGabriel, puntoZMilagro];
 
   var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
@@ -383,11 +383,11 @@ function cargarListaVehiculos(){
       var fechaInicio = new Date(dateParts[1] + "/" + dateParts[0] + "/" + dateParts[2] + " " + horaInicio + ":" + minutosInicio).getTime() / 1000;
       dateParts = $("#fechaFin").val().split("/");
       var fechaFin = new Date(dateParts[1] + "/" + dateParts[0] + "/" + dateParts[2] + " " + horaFin + ":" + minutosFin).getTime() / 1000;
-      var url = "http://142.93.185.141:8080/webservice/gps.json?a=monitoreo&u=e.arcoiris&p=123arcoiris&d=" + identificador + "&rf=" + fechaInicio + "&rt=" + fechaFin;
+      var url = "http://142.93.185.141:8080/webservice/gps.json?a=monitoreo&u=e.arcoiris&p=mel@min@2020&d=" + identificador + "&rf=" + fechaInicio + "&rt=" + fechaFin;
       console.log(url);
       $.ajax({
         //url: "http://www.sinotracking.com/app/AppJson.asp?Cmd=Proc_GetTrack&Data=N\'"+identificador+"\'%2CN\'"+fechaInicio+"\'%2CN\'"+fechaFin+"\'%2CN\'1000\'&Field=",
-        url: "http://142.93.185.141:8080/webservice/gps.json?a=monitoreo&u=e.arcoiris&p=123arcoiris&d=" + identificador + "&rf=" + fechaInicio + "&rt=" + fechaFin + "&l=250",
+        url: "http://142.93.185.141:8080/webservice/gps.json?a=monitoreo&u=e.arcoiris&p=mel@min@2020&d=" + identificador + "&rf=" + fechaInicio + "&rt=" + fechaFin + "&l=250",
         method: "GET",
         cache: false,
         async: false,
